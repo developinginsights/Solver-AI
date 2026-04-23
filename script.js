@@ -1,75 +1,73 @@
 /* ─────────────────────────────────────────────────────────────────
-   SOLVER AI — Chat Script
-   API: https://solver-ai-xcd8.onrender.com
+   SOLVER AI — Chat Engine  v2
+   Premium micro-interactions + lead capture
 ───────────────────────────────────────────────────────────────── */
 
 const API_URL = "https://solver-ai-xcd8.onrender.com/api/chat/message";
 
-// ── State ─────────────────────────────────────────────────────────
+// ── State ──────────────────────────────────────────────────────────
 const state = {
-  sessionId:      crypto.randomUUID(),
-  messageCount:   0,   // counts AI responses received
-  leadShown:      false,
-  leadSubmitted:  false,
-  isLoading:      false,
+  sessionId:    crypto.randomUUID(),
+  aiCount:      0,       // tracks AI replies received
+  leadShown:    false,
+  leadDone:     false,
+  isLoading:    false,
 };
 
-// ── DOM refs ──────────────────────────────────────────────────────
-const messagesEl    = document.getElementById("chatMessages");
-const inputEl       = document.getElementById("msgInput");
-const sendBtn       = document.getElementById("sendBtn");
-const quickActions  = document.getElementById("quickActions");
+// ── DOM ────────────────────────────────────────────────────────────
+const messagesEl   = document.getElementById("chatMessages");
+const inputEl      = document.getElementById("msgInput");
+const sendBtn      = document.getElementById("sendBtn");
+const sendRipple   = document.getElementById("sendRipple");
+const quickActions = document.getElementById("quickActions");
 
-// ── Init ──────────────────────────────────────────────────────────
-window.addEventListener("DOMContentLoaded", () => {
-  // Show greeting from AI
-  appendAIMessage(
-    "👋 Hi! I'm Solver AI — your real estate assistant.\n\nI can help you buy, sell, or invest in properties in DHA Lahore and surrounding areas. What are you looking for today?"
-  );
+// ── Boot ───────────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  // Initial AI greeting — slight delay for a natural feel
+  setTimeout(() => {
+    appendAI("👋 Hi! I'm Solver AI — your real estate assistant.\n\nI can help you buy, sell, or invest in properties across DHA Lahore and surrounding areas. What are you looking for today?");
+  }, 300);
 
-  // Quick action buttons
+  // Quick-action buttons
   quickActions.querySelectorAll(".quick-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const msg = btn.dataset.msg;
       hideQuickActions();
-      sendMessage(msg);
+      sendMessage(btn.dataset.msg);
     });
   });
 
-  // Enter to send (Shift+Enter = newline)
+  // Enter = send, Shift+Enter = newline
   inputEl.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
   });
 
   // Auto-grow textarea
-  inputEl.addEventListener("input", () => {
-    inputEl.style.height = "auto";
-    inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + "px";
+  inputEl.addEventListener("input", growInput);
+
+  // Send button with ripple
+  sendBtn.addEventListener("click", () => {
+    triggerRipple();
+    handleSend();
   });
 
-  sendBtn.addEventListener("click", handleSend);
   inputEl.focus();
 });
 
-// ── Handle send ───────────────────────────────────────────────────
+// ── Handle send ────────────────────────────────────────────────────
 function handleSend() {
   const text = inputEl.value.trim();
   if (!text || state.isLoading) return;
   hideQuickActions();
-  inputEl.value = "";
-  inputEl.style.height = "auto";
+  resetInput();
   sendMessage(text);
 }
 
-// ── Core: send message to API ─────────────────────────────────────
+// ── Core: API call ─────────────────────────────────────────────────
 async function sendMessage(text) {
   if (state.isLoading) return;
-
-  appendUserMessage(text);
   setLoading(true);
+
+  appendUser(text);
   const typingEl = showTyping();
 
   try {
@@ -80,191 +78,221 @@ async function sendMessage(text) {
     });
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
     const data = await res.json();
+
     removeTyping(typingEl);
+    appendAI(data.response);
+    state.aiCount++;
 
-    appendAIMessage(data.response);
-    state.messageCount++;
-
-    // Show lead capture card after 3 AI responses
-    if (state.messageCount >= 3 && !state.leadShown) {
-      setTimeout(showLeadCapture, 600);
+    // Show lead card after 3 AI responses, with a small delay
+    if (state.aiCount >= 3 && !state.leadShown) {
+      setTimeout(showLeadCard, 700);
     }
-
   } catch (err) {
     removeTyping(typingEl);
-    showError("Connection failed. Please try again.");
+    showError("⚠️ Couldn't reach the server. Please try again.");
     console.error("API error:", err);
   } finally {
     setLoading(false);
   }
 }
 
-// ── Append user bubble ────────────────────────────────────────────
-function appendUserMessage(text) {
-  const row = createRow("user");
-
-  const avatar = el("div", "msg-avatar", "U");
-  const group  = el("div", "msg-group");
-  const bubble = el("div", "msg-bubble", text);
-  const time   = el("div", "msg-time", timestamp());
-
-  group.appendChild(bubble);
-  group.appendChild(time);
+// ── Append user bubble ─────────────────────────────────────────────
+function appendUser(text) {
+  const { row, group } = createRow("user");
+  const avatar = avatar$("U", "msg-avatar");
+  group.appendChild(bubble$(text));
+  group.appendChild(time$());
   row.appendChild(avatar);
   row.appendChild(group);
-
   messagesEl.appendChild(row);
-  scrollToBottom();
+  scroll();
 }
 
-// ── Append AI bubble ──────────────────────────────────────────────
-function appendAIMessage(text) {
-  const row    = createRow("ai");
-  const avatar = makeAIAvatar();
-  const group  = el("div", "msg-group");
-  const bubble = el("div", "msg-bubble", text);
-  const time   = el("div", "msg-time", timestamp());
-
-  group.appendChild(bubble);
-  group.appendChild(time);
+// ── Append AI bubble ───────────────────────────────────────────────
+function appendAI(text) {
+  const { row, group } = createRow("ai");
+  const avatar = avatar$("AI", "msg-avatar");
+  group.appendChild(bubble$(text));
+  group.appendChild(time$());
   row.appendChild(avatar);
   row.appendChild(group);
-
   messagesEl.appendChild(row);
-  scrollToBottom();
+  scroll();
 }
 
-// ── Typing indicator ──────────────────────────────────────────────
+// ── Typing indicator ───────────────────────────────────────────────
 function showTyping() {
-  const row    = document.createElement("div");
-  row.className = "typing-row msg-row ai";
-
-  const avatar = makeAIAvatar();
-  const bubble = document.createElement("div");
-  bubble.className = "typing-bubble";
-  bubble.innerHTML = "<span></span><span></span><span></span>";
-
+  const row    = make("div", "typing-row msg-row ai");
+  const avatar = avatar$("AI", "msg-avatar");
+  const bub    = make("div", "typing-bubble");
+  bub.innerHTML = "<span></span><span></span><span></span>";
   row.appendChild(avatar);
-  row.appendChild(bubble);
+  row.appendChild(bub);
   messagesEl.appendChild(row);
-  scrollToBottom();
+  scroll();
   return row;
 }
 
 function removeTyping(el) { el?.remove(); }
 
-// ── Lead capture card ─────────────────────────────────────────────
-function showLeadCapture() {
+// ── Lead capture card ──────────────────────────────────────────────
+function showLeadCard() {
   if (state.leadShown) return;
   state.leadShown = true;
 
-  const card = document.createElement("div");
-  card.className = "lead-card";
+  const card = make("div", "lead-card");
   card.innerHTML = `
-    <div class="lead-card-header">
-      <span class="lead-card-icon">🏡</span>
-      <div class="lead-card-title">Get Exclusive Property Deals in DHA Lahore</div>
-    </div>
+    <div class="lead-card-eyebrow">Exclusive Offer</div>
+    <div class="lead-card-title">🏡 Get the Best Property Deals in DHA Lahore</div>
     <p class="lead-card-desc">
-      Leave your details and our team will send you the best options matching your needs — no spam, ever.
+      Share your details and our team will reach out with hand-picked options that match your needs — no spam, ever.
     </p>
-    <input class="lead-input" id="leadName"  type="text"  placeholder="Your Name" autocomplete="name" />
-    <input class="lead-input" id="leadPhone" type="tel"   placeholder="Phone / WhatsApp" autocomplete="tel" />
-    <button class="lead-submit-btn" id="leadSubmitBtn" type="button">Get Options →</button>
+    <div class="lead-field">
+      <label for="lName">Your Name</label>
+      <input class="lead-input" id="lName" type="text" placeholder="e.g. Ahmed Khan" autocomplete="name" />
+    </div>
+    <div class="lead-field">
+      <label for="lPhone">Phone / WhatsApp</label>
+      <input class="lead-input" id="lPhone" type="tel" placeholder="+92 300 0000000" autocomplete="tel" />
+    </div>
+    <button type="button" class="lead-submit" id="leadSubmit">Get My Options →</button>
   `;
 
   messagesEl.appendChild(card);
-  scrollToBottom();
+  scroll();
 
-  document.getElementById("leadSubmitBtn").addEventListener("click", submitLead);
+  document.getElementById("leadSubmit").addEventListener("click", submitLead);
+
+  // Focus name field after card appears
+  setTimeout(() => document.getElementById("lName")?.focus(), 500);
 }
 
 async function submitLead() {
-  if (state.leadSubmitted) return;
+  if (state.leadDone) return;
 
-  const name  = document.getElementById("leadName").value.trim();
-  const phone = document.getElementById("leadPhone").value.trim();
+  const name  = document.getElementById("lName").value.trim();
+  const phone = document.getElementById("lPhone").value.trim();
 
-  if (!name || !phone) {
-    document.getElementById("leadName").focus();
-    return;
-  }
+  if (!name) { document.getElementById("lName").focus(); shake(document.getElementById("lName")); return; }
+  if (!phone) { document.getElementById("lPhone").focus(); shake(document.getElementById("lPhone")); return; }
 
-  state.leadSubmitted = true;
+  state.leadDone = true;
+  document.getElementById("leadSubmit").textContent = "Sending…";
+  document.getElementById("leadSubmit").disabled = true;
 
-  // Send contact info into the conversation so backend captures it
-  const contactMsg = `My name is ${name} and my phone/WhatsApp is ${phone}.`;
+  // Push contact info into conversation so backend captures it
   try {
     await fetch(API_URL, {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ session_id: state.sessionId, message: contactMsg }),
+      body:    JSON.stringify({
+        session_id: state.sessionId,
+        message: `My name is ${name} and my WhatsApp/phone number is ${phone}.`,
+      }),
     });
   } catch (_) { /* non-fatal */ }
 
-  // Replace form with success message
+  // Replace form with success state
   const card = document.querySelector(".lead-card");
   card.innerHTML = `
-    <div class="lead-card-header">
-      <span class="lead-card-icon">🏡</span>
-      <div class="lead-card-title">Get Exclusive Property Deals in DHA Lahore</div>
+    <div class="lead-card-eyebrow">All set!</div>
+    <div class="lead-card-title">🏡 Get the Best Property Deals in DHA Lahore</div>
+    <div class="lead-success">
+      <div class="lead-success-icon">✓</div>
+      <span>Thanks, ${name}! Our team will contact you on <strong>${phone}</strong> shortly.</span>
     </div>
-    <div class="lead-success">Details received! Our team will contact you shortly.</div>
   `;
-
-  scrollToBottom();
+  scroll();
 }
 
-// ── Error toast ───────────────────────────────────────────────────
+// ── Error toast ────────────────────────────────────────────────────
 function showError(msg) {
-  const toast = el("div", "error-toast", `⚠️ ${msg}`);
+  const toast = make("div", "error-toast");
+  toast.textContent = msg;
   messagesEl.appendChild(toast);
-  scrollToBottom();
-  setTimeout(() => toast.remove(), 5000);
+  scroll();
+  setTimeout(() => { toast.style.opacity = "0"; setTimeout(() => toast.remove(), 300); }, 5000);
 }
 
-// ── Quick actions ─────────────────────────────────────────────────
+// ── Quick actions ──────────────────────────────────────────────────
 function hideQuickActions() {
   quickActions.classList.add("hidden");
 }
 
-// ── Loading state ─────────────────────────────────────────────────
-function setLoading(active) {
-  state.isLoading   = active;
-  sendBtn.disabled  = active;
-  inputEl.disabled  = active;
-  if (!active) inputEl.focus();
+// ── Loading state ──────────────────────────────────────────────────
+function setLoading(on) {
+  state.isLoading  = on;
+  sendBtn.disabled = on;
+  inputEl.disabled = on;
+  if (!on) { inputEl.focus(); }
 }
 
-// ── Helpers ───────────────────────────────────────────────────────
+// ── Ripple effect on send button ───────────────────────────────────
+function triggerRipple() {
+  sendRipple.classList.remove("animate");
+  void sendRipple.offsetWidth; // reflow
+  sendRipple.classList.add("animate");
+}
+
+// ── Shake animation for invalid fields ────────────────────────────
+function shake(el) {
+  el.style.animation = "none";
+  el.style.borderColor = "#EF4444";
+  el.style.boxShadow  = "0 0 0 3px rgba(239,68,68,.15)";
+  void el.offsetWidth;
+  el.style.animation = "shakeField .35s ease";
+  el.addEventListener("input", () => {
+    el.style.borderColor = "";
+    el.style.boxShadow   = "";
+    el.style.animation   = "";
+  }, { once: true });
+}
+
+// ── DOM helpers ────────────────────────────────────────────────────
 function createRow(role) {
-  const row = document.createElement("div");
-  row.className = `msg-row ${role}`;
-  return row;
+  const row   = make("div", `msg-row ${role}`);
+  const group = make("div", "msg-group");
+  row.appendChild(group);
+  return { row, group };
 }
 
-function makeAIAvatar() {
-  const avatar = document.createElement("div");
-  avatar.className = "msg-avatar";
-  avatar.textContent = "AI";
-  return avatar;
+function avatar$(initials, cls) {
+  const el = make("div", cls);
+  el.textContent = initials;
+  return el;
 }
 
-function el(tag, className, text = "") {
-  const node = document.createElement(tag);
-  node.className = className;
-  if (text) node.textContent = text;
-  return node;
+function bubble$(text) {
+  const el = make("div", "msg-bubble");
+  el.textContent = text;
+  return el;
 }
 
-function scrollToBottom() {
+function time$() {
+  const el = make("div", "msg-time");
+  el.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return el;
+}
+
+function make(tag, cls = "") {
+  const el = document.createElement(tag);
+  if (cls) el.className = cls;
+  return el;
+}
+
+function scroll() {
   requestAnimationFrame(() => {
-    messagesEl.scrollTop = messagesEl.scrollHeight;
+    messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: "smooth" });
   });
 }
 
-function timestamp() {
-  return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+function growInput() {
+  inputEl.style.height = "auto";
+  inputEl.style.height = Math.min(inputEl.scrollHeight, 110) + "px";
+}
+
+function resetInput() {
+  inputEl.value = "";
+  inputEl.style.height = "auto";
 }

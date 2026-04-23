@@ -6,82 +6,93 @@
   <title>Solver AI — Real Estate Assistant</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <div class="page-bg">
-    <div class="chat-card">
+  <!-- Ambient background orbs -->
+  <div class="orb orb-1" aria-hidden="true"></div>
+  <div class="orb orb-2" aria-hidden="true"></div>
+  <div class="orb orb-3" aria-hidden="true"></div>
 
-      <!-- ── HEADER ─────────────────────────────────────── -->
-      <header class="chat-header">
-        <div class="header-logo">
-          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="40" height="40" rx="12" fill="url(#logoGrad)"/>
-            <path d="M20 10L28 15V25L20 30L12 25V15L20 10Z" fill="white" fill-opacity="0.9"/>
-            <path d="M20 14L25 17V23L20 26L15 23V17L20 14Z" fill="url(#logoGrad2)"/>
-            <defs>
-              <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#2563EB"/>
-                <stop offset="1" stop-color="#1D4ED8"/>
-              </linearGradient>
-              <linearGradient id="logoGrad2" x1="15" y1="14" x2="25" y2="26" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#60A5FA"/>
-                <stop offset="1" stop-color="#3B82F6"/>
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-        <div class="header-info">
-          <div class="header-title">Solver AI</div>
-          <div class="header-subtitle">Real Estate Assistant</div>
-        </div>
-        <div class="header-status">
-          <span class="status-pulse"></span>
+  <div class="chat-card">
+
+    <!-- ── HEADER ──────────────────────────────────────────── -->
+    <header class="chat-header">
+      <div class="header-logo">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="40" height="40" rx="12" fill="url(#lg1)"/>
+          <path d="M20 10L28 15V25L20 30L12 25V15L20 10Z" fill="white" fill-opacity="0.95"/>
+          <path d="M20 14L25 17V23L20 26L15 23V17L20 14Z" fill="url(#lg2)"/>
+          <defs>
+            <linearGradient id="lg1" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#3B82F6"/><stop offset="1" stop-color="#1D4ED8"/>
+            </linearGradient>
+            <linearGradient id="lg2" x1="15" y1="14" x2="25" y2="26" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#93C5FD"/><stop offset="1" stop-color="#60A5FA"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="header-info">
+        <div class="header-title">Solver AI</div>
+        <div class="header-subtitle">Real Estate Assistant</div>
+      </div>
+      <div class="header-right">
+        <div class="status-badge">
+          <span class="status-ring"></span>
           <span class="status-dot"></span>
           <span class="status-label">Online</span>
         </div>
-      </header>
-
-      <!-- ── MESSAGES ───────────────────────────────────── -->
-      <main class="chat-messages" id="chatMessages"></main>
-
-      <!-- ── QUICK ACTIONS ──────────────────────────────── -->
-      <div class="quick-actions" id="quickActions">
-        <p class="quick-label">Quick start →</p>
-        <div class="quick-btns">
-          <button class="quick-btn" data-msg="I want to buy a property in DHA Lahore">
-            <span class="quick-icon">🏠</span> Buy Property
-          </button>
-          <button class="quick-btn" data-msg="I want to sell my property">
-            <span class="quick-icon">🏷️</span> Sell Property
-          </button>
-          <button class="quick-btn" data-msg="I'm looking for investment opportunities in real estate">
-            <span class="quick-icon">📈</span> Investment
-          </button>
-        </div>
       </div>
+    </header>
 
-      <!-- ── INPUT FOOTER ───────────────────────────────── -->
-      <footer class="chat-footer">
-        <div class="input-row">
-          <textarea
-            id="msgInput"
-            placeholder="Ask about buying, selling, or investing…"
-            rows="1"
-            autocomplete="off"
-          ></textarea>
-          <button id="sendBtn" class="send-btn" aria-label="Send">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-            </svg>
-          </button>
-        </div>
-        <p class="footer-note">Powered by Solver AI &middot; Real Estate Platform</p>
-      </footer>
+    <!-- ── MESSAGES ────────────────────────────────────────── -->
+    <main class="chat-messages" id="chatMessages"></main>
 
+    <!-- ── QUICK ACTIONS ────────────────────────────────────── -->
+    <div class="quick-actions" id="quickActions">
+      <span class="quick-label">Get started</span>
+      <div class="quick-btns">
+        <button type="button" class="quick-btn" data-msg="I want to buy a property in DHA Lahore">
+          <span class="qb-icon">🏠</span><span class="qb-text">Buy Property</span>
+        </button>
+        <button type="button" class="quick-btn" data-msg="I want to sell my property">
+          <span class="qb-icon">🏷️</span><span class="qb-text">Sell Property</span>
+        </button>
+        <button type="button" class="quick-btn" data-msg="I'm looking for real estate investment opportunities">
+          <span class="qb-icon">📈</span><span class="qb-text">Investment</span>
+        </button>
+      </div>
     </div>
+
+    <!-- ── INPUT FOOTER ─────────────────────────────────────── -->
+    <footer class="chat-footer">
+      <div class="input-row" id="inputRow">
+        <textarea
+          id="msgInput"
+          placeholder="Ask about buying, selling, or investing…"
+          rows="1"
+          autocomplete="off"
+          spellcheck="false"
+        ></textarea>
+        <button type="button" id="sendBtn" class="send-btn" aria-label="Send message">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+          <span class="send-ripple" id="sendRipple"></span>
+        </button>
+      </div>
+      <p class="footer-note">
+        <svg class="lock-icon" viewBox="0 0 12 14" fill="none">
+          <rect x="1" y="6" width="10" height="8" rx="2" fill="currentColor" fill-opacity=".4"/>
+          <path d="M3 6V4a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        End-to-end encrypted &middot; Powered by Solver AI
+      </p>
+    </footer>
+
   </div>
 
   <script src="script.js"></script>
