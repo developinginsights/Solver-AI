@@ -1,5 +1,4 @@
-const API_URL = "http://localhost:8000/api/chat/message";
-
+const API_URL = "https://solver-ai-xcd8.onrender.com/api/chat/message";
 // ─── State ────────────────────────────────────────────────────────
 let sessionId = null;
 let isLoading = false;
