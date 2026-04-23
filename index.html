@@ -3,55 +3,85 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Solver AI • Automation Assistant</title>
+  <title>Solver AI — Real Estate Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <div class="chat-wrapper">
+  <div class="page-bg">
+    <div class="chat-card">
 
-    <!-- Header -->
-    <header class="chat-header">
-      <div class="header-avatar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
-          <path d="M12 6v6l4 2"/>
-        </svg>
-      </div>
-      <div class="header-info">
-        <h1>Solver AI • Automation Assistant</h1>
-        <span class="status-dot"></span><span class="status-text">Online</span>
-      </div>
-      <div class="lead-badge" id="leadBadge" title="Lead score">
-        <span id="leadStatus">—</span>
-      </div>
-    </header>
-
-    <!-- Messages -->
-    <main class="chat-messages" id="chatMessages">
-      <div class="welcome-msg">
-        <p>👋 Hi! I'm Solver AI — I help automate tasks and generate leads for your business. What would you like to solve today?</p>
-      </div>
-    </main>
-
-    <!-- Input -->
-    <footer class="chat-footer">
-      <div class="input-row">
-        <textarea
-          id="messageInput"
-          placeholder="Type a message…"
-          rows="1"
-          autocomplete="off"
-          autofocus
-        ></textarea>
-        <button id="sendBtn" class="send-btn" aria-label="Send message">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+      <!-- ── HEADER ─────────────────────────────────────── -->
+      <header class="chat-header">
+        <div class="header-logo">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="12" fill="url(#logoGrad)"/>
+            <path d="M20 10L28 15V25L20 30L12 25V15L20 10Z" fill="white" fill-opacity="0.9"/>
+            <path d="M20 14L25 17V23L20 26L15 23V17L20 14Z" fill="url(#logoGrad2)"/>
+            <defs>
+              <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#2563EB"/>
+                <stop offset="1" stop-color="#1D4ED8"/>
+              </linearGradient>
+              <linearGradient id="logoGrad2" x1="15" y1="14" x2="25" y2="26" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#60A5FA"/>
+                <stop offset="1" stop-color="#3B82F6"/>
+              </linearGradient>
+            </defs>
           </svg>
-        </button>
-      </div>
-    </footer>
+        </div>
+        <div class="header-info">
+          <div class="header-title">Solver AI</div>
+          <div class="header-subtitle">Real Estate Assistant</div>
+        </div>
+        <div class="header-status">
+          <span class="status-pulse"></span>
+          <span class="status-dot"></span>
+          <span class="status-label">Online</span>
+        </div>
+      </header>
 
+      <!-- ── MESSAGES ───────────────────────────────────── -->
+      <main class="chat-messages" id="chatMessages"></main>
+
+      <!-- ── QUICK ACTIONS ──────────────────────────────── -->
+      <div class="quick-actions" id="quickActions">
+        <p class="quick-label">Quick start →</p>
+        <div class="quick-btns">
+          <button class="quick-btn" data-msg="I want to buy a property in DHA Lahore">
+            <span class="quick-icon">🏠</span> Buy Property
+          </button>
+          <button class="quick-btn" data-msg="I want to sell my property">
+            <span class="quick-icon">🏷️</span> Sell Property
+          </button>
+          <button class="quick-btn" data-msg="I'm looking for investment opportunities in real estate">
+            <span class="quick-icon">📈</span> Investment
+          </button>
+        </div>
+      </div>
+
+      <!-- ── INPUT FOOTER ───────────────────────────────── -->
+      <footer class="chat-footer">
+        <div class="input-row">
+          <textarea
+            id="msgInput"
+            placeholder="Ask about buying, selling, or investing…"
+            rows="1"
+            autocomplete="off"
+          ></textarea>
+          <button id="sendBtn" class="send-btn" aria-label="Send">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+            </svg>
+          </button>
+        </div>
+        <p class="footer-note">Powered by Solver AI &middot; Real Estate Platform</p>
+      </footer>
+
+    </div>
   </div>
 
   <script src="script.js"></script>
