@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solver AI • Automation Assistant</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="chat-wrapper">
+
+    <!-- Header -->
+    <header class="chat-header">
+      <div class="header-avatar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+      </div>
+      <div class="header-info">
+        <h1>Solver AI • Automation Assistant</h1>
+        <span class="status-dot"></span><span class="status-text">Online</span>
+      </div>
+      <div class="lead-badge" id="leadBadge" title="Lead score">
+        <span id="leadStatus">—</span>
+      </div>
+    </header>
+
+    <!-- Messages -->
+    <main class="chat-messages" id="chatMessages">
+      <div class="welcome-msg">
+        <p>👋 Hi! I'm Solver AI — I help automate tasks and generate leads for your business. What would you like to solve today?</p>
+      </div>
+    </main>
+
+    <!-- Input -->
+    <footer class="chat-footer">
+      <div class="input-row">
+        <textarea
+          id="messageInput"
+          placeholder="Type a message…"
+          rows="1"
+          autocomplete="off"
+          autofocus
+        ></textarea>
+        <button id="sendBtn" class="send-btn" aria-label="Send message">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
